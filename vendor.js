@@ -55,7 +55,7 @@
     if (!user) return renderSignIn();
     try {
       const [{ data: s, error: e1 }, { data: w, error: e2 }] = await Promise.all([
-        sb.rpc('my_stores'), sb.from('wines').select('id,name,producer,varietal,color').order('name').limit(5000)
+        sb.rpc('my_stores'), sb.from('wines').select('id,name,producer,varietal,color').is('merged_into', null).order('name').limit(5000)
       ]);
       if (e1) throw e1; if (e2) throw e2;
       stores = s; wines = w;

@@ -76,9 +76,10 @@ main {
 .btn.primary { background: var(--garnet); border-color: var(--garnet); color: var(--garnet-ink); }
 .btn.block { width: 100%; margin-top: 14px; }
 .btn:disabled { opacity: .5; cursor: default; }
-.scanrow { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
-.scanrow .btn { border-style: dashed; }
-#scanStatus { flex: 1 1 200px; min-width: 0; }
+.scanrow { display: grid; grid-template-columns: repeat(2, minmax(0, 132px)); gap: 12px; align-items: stretch; }
+.scanrow .btn { border-style: dashed; aspect-ratio: 1 / 1; flex-direction: column; gap: 10px; padding: 12px; text-align: center; line-height: 1.2; }
+.scanrow .btn .i { width: 30px; height: 30px; }
+#scanStatus { grid-column: 1 / -1; min-width: 0; }
 
 .controls { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 15px; color: var(--muted); }
 .place { display: inline-flex; gap: 6px; align-items: center; background: none; border: 0; padding: 4px 0; cursor: pointer; color: var(--ink); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; }

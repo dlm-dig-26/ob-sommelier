@@ -78,7 +78,7 @@
     if (LIVE) {
       await loadScript(SUPABASE_JS);
       state.sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY, { auth: { persistSession: false } });
-      const { data, error } = await state.sb.from('wines').select('*').limit(5000);
+      const { data, error } = await state.sb.from('wines').select('*').is('merged_into', null).limit(5000);
       if (error) throw error;
       state.wines = data;
       const pop = await state.sb.rpc('popular_wines', { p_days: 30 });
@@ -185,7 +185,7 @@
 
   // Similarity: same color required; varietal, structure (body/sweetness/acidity/tannin), origin.
   function similarity(a, b) {
-    if (a.id === b.id || a.color !== b.color) return 0;
+    if (a.id === b.id || !a.color || a.color !== b.color || b.partial) return 0;
     let s = 1;
     if (norm(a.varietal) === norm(b.varietal)) s += 3;
     for (const k of ['body', 'sweetness', 'acidity', 'tannin']) s += 1 - Math.abs((a[k] || 3) - (b[k] || 3)) / 4;
@@ -294,9 +294,11 @@
       el('h3', { text: w.name }),
       el('p', { class: 'meta', text: describe(w) }),
       w.flavor_notes ? el('p', { class: 'notes', text: w.flavor_notes }) : null,
-      el('div', { class: 'profile' },
-        el('span', null, 'Body', dots(w.body)), el('span', null, 'Sweetness', dots(w.sweetness)),
-        el('span', null, 'Acidity', dots(w.acidity)), el('span', null, 'Tannin', dots(w.tannin))));
+      w.partial
+        ? el('p', { class: 'small muted', text: 'Read from a shelf photo; full details coming soon.' })
+        : el('div', { class: 'profile' },
+          el('span', null, 'Body', dots(w.body)), el('span', null, 'Sweetness', dots(w.sweetness)),
+          el('span', null, 'Acidity', dots(w.acidity)), el('span', null, 'Tannin', dots(w.tannin))));
 
     const where = el('div', { class: 'where' });
     if (mine.length) {
