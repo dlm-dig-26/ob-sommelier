@@ -174,7 +174,9 @@
           el('button', { class: 'btn', type: 'button', text: 'Choose from gallery', onclick: () => photoInput.click() }),
           count),
         preview, field('Note', note),
-        el('p', { class: 'small muted', text: 'One shelf section per photo, labels and price tags filling the frame, no flash glare. Ask the manager before you start.' }),
+        el('div', { class: 'small muted' },
+          el('b', { text: 'Photos that work best: ' }),
+          'hold the phone sideways (landscape), 2 shelves per photo, with the price-tag rail in the frame. Stand straight in front of the shelf, about 1 m away. Use the normal 1x lens, not 0.5x wide. Move left to right with a little overlap, and add one close-up for any bottle whose variety you can’t read. Ask the manager before you start.'),
         send));
   }
 
