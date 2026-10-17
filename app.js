@@ -225,7 +225,9 @@
   const COLOR_LABEL = { red: 'Red', white: 'White', rose: 'Rosé', sparkling: 'Sparkling', dessert: 'Dessert' };
   function describe(w) {
     const origin = [w.region, w.country].filter(Boolean).join(', ');
-    const what = [COLOR_LABEL[w.color], w.varietal].filter(Boolean).join(' ');
+    const col = COLOR_LABEL[w.color];
+    // Avoid "Red Red Blend" / "Rosé Rosé Blend" when the grape name already starts with the colour.
+    const what = (w.varietal && col && norm(w.varietal).startsWith(norm(col))) ? w.varietal : [col, w.varietal].filter(Boolean).join(' ');
     return origin ? `${what} from ${origin}` : what;
   }
 
