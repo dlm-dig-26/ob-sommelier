@@ -62,9 +62,14 @@
       </form>
       <div class="scanrow">
         <input id="scanInput" class="vh" type="file" accept="image/*" capture="environment" tabindex="-1" aria-hidden="true" />
+        <input id="pickInput" class="vh" type="file" accept="image/*" tabindex="-1" aria-hidden="true" />
         <button id="scanBtn" class="btn" type="button">
           <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
           Scan a label
+        </button>
+        <button id="pickBtn" class="btn" type="button">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg>
+          Choose a photo
         </button>
         <span id="scanStatus" class="small muted" hidden></span>
       </div>

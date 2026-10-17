@@ -549,6 +549,9 @@
     // The button opens the phone camera through the file picker (no separate camera permission needed).
     $('scanBtn').addEventListener('click', () => { toastScan(''); $('scanInput').click(); });
     $('scanInput').addEventListener('change', (e) => handleScan(e.target.files[0]));
+    // Same label reader for a photo already on the phone (gallery / files, no camera).
+    $('pickBtn').addEventListener('click', () => { toastScan(''); $('pickInput').click(); });
+    $('pickInput').addEventListener('change', (e) => { handleScan(e.target.files[0]).finally(() => { e.target.value = ''; }); });
     $('interstitialClose').addEventListener('click', () => { $('interstitial').hidden = true; });
     $('suggest').replaceChildren(...['Cabernet', 'Malbec', 'Pinot Noir', 'Sauvignon Blanc', 'Prosecco', 'Rosé'].map((s) =>
       el('button', { class: 'chip', type: 'button', text: s, onclick: () => { $('q').value = s; runSearch(s, 'text'); } })));
