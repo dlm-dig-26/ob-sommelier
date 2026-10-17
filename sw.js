@@ -1,5 +1,5 @@
 // Bump VERSION on every release; old caches are deleted on activate.
-const VERSION = 'ob-2026-10-17-1';
+const VERSION = 'ob-20261017b';
 // Paths are relative to this file, so the app works at a domain root or a sub-path (GitHub Pages).
 const CORE = ['./', 'index.html', 'styles.css', 'app.js', 'config.js', 'manifest.json',
   'data/demo.json', 'icons/icon-192.png', 'vendor.html', 'vendor.js', 'contribute.html', 'contribute.js', 'privacy.html'];
@@ -20,7 +20,7 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
   e.respondWith(
-    fetch(req).then((res) => {
+    fetch(req, { cache: 'no-cache' }).then((res) => {
       if (res.ok) { const copy = res.clone(); caches.open(VERSION).then((c) => c.put(req, copy)); }
       return res;
     }).catch(() => caches.match(req, { ignoreSearch: true })
