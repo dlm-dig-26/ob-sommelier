@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>OB Sommelier</title>
+  <meta name="description" content="Find where to buy a wine near you in Aruba, at the best price, and what to eat with it." />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#8c1c34" />
+  <link rel="icon" href="icons/icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="OB Sommelier" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Gloock&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- AGE GATE -->
+  <div id="ageGate" class="overlay" hidden>
+    <div class="sheet center" role="dialog" aria-modal="true" aria-labelledby="ageTitle">
+      <div class="logo-lg" aria-hidden="true"></div>
+      <h2 id="ageTitle">Welcome to OB Sommelier</h2>
+      <p class="muted">This app is about alcoholic drinks. Are you <span id="minAge">18</span> or older?</p>
+      <div class="row gap">
+        <button class="btn" id="ageNo" type="button">No</button>
+        <button class="btn primary" id="ageYes" type="button">Yes, I am</button>
+      </div>
+      <p class="small muted" style="margin:14px 0 0">By continuing you accept the <a href="privacy.html">terms and privacy note</a>.</p>
+    </div>
+  </div>
+  <div id="ageBlocked" class="overlay" hidden>
+    <div class="sheet center"><h2>Come back later</h2><p class="muted">You need to be of legal drinking age to use this app.</p></div>
+  </div>
+
+  <!-- INTERSTITIAL (rate-limited, never on launch) -->
+  <div id="interstitial" class="overlay" hidden>
+    <div class="sheet center" role="dialog" aria-modal="true">
+      <p class="tag">Sponsored</p>
+      <div id="interstitialBody"></div>
+      <button class="btn primary block" id="interstitialClose" type="button">Continue</button>
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <h1>OB Sommelier</h1>
+    </div>
+    <span id="modeBadge" class="badge" hidden>Demo data</span>
+  </header>
+
+  <div id="adTop" class="ad" hidden></div>
+
+  <main>
+    <section class="finder" aria-labelledby="finderTitle">
+      <h2 id="finderTitle" class="lede">Which wine are you looking for?</h2>
+      <form id="searchForm" class="search" autocomplete="off" role="search">
+        <input id="q" type="search" placeholder="Name, producer or grape" aria-label="Wine name, producer or grape" enterkeyhint="search" />
+        <button class="btn primary" type="submit">Search</button>
+      </form>
+      <div class="scanrow">
+        <input id="scanInput" class="vh" type="file" accept="image/*" capture="environment" tabindex="-1" aria-hidden="true" />
+        <button id="scanBtn" class="btn" type="button">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+          Scan a label
+        </button>
+        <span id="scanStatus" class="small muted" hidden></span>
+      </div>
+      <div class="controls">
+        <button id="locBtn" class="place" type="button">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg>
+          <span>Near <span id="locLabel">Oranjestad</span></span>
+        </button>
+        <label class="radius" for="radius">within
+          <select id="radius">
+            <option value="5">5 km</option>
+            <option value="10">10 km</option>
+            <option value="20">20 km</option>
+            <option value="40">the whole island</option>
+          </select>
+        </label>
+      </div>
+      <div id="suggest" class="chips" aria-label="Popular searches"></div>
+    </section>
+
+    <section id="results" aria-live="polite"></section>
+
+    <details id="guide" class="guide">
+      <summary>
+        <span class="guide-title">Pairing guide</span>
+        <span class="guide-sub" id="guideSub">What to drink with stobá, keshi yena, fresh fish and more</span>
+        <span class="chev" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+      </summary>
+      <div id="pairings" class="pairings"></div>
+    </details>
+
+    <div id="adBottom" class="ad" hidden></div>
+
+    <footer class="foot">
+      <p>Prices and stock come from stores, shoppers and shelf photos, and can change. A store price disappears if it isn't confirmed within <span id="staleDays">30</span> days; a shelf sighting turns amber (“last known”). At the store? Tap “Found it” or “Not there” to keep it accurate.</p>
+      <p>Own a store? <a href="vendor.html">List your wines</a>. Helping us map shelves? <a href="contribute.html">Contributor sign-in</a>.</p>
+      <p><a href="privacy.html">Privacy and terms</a>. Recipes from TheMealDB. Please drink responsibly.</p>
+    </footer>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

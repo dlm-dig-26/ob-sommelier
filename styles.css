@@ -1,0 +1,229 @@
+/* OB Sommelier — "daylight wine shop".
+   Layout: one left-aligned column; the finder sits on the page, results are label-like panels,
+   the pairing guide is a collapsible library below. The one loud element is the yellow shelf tag on prices. */
+:root {
+  --paper: #f1f4ef;      /* pale bottle-glass green */
+  --surface: #ffffff;
+  --ink: #1d2c23;        /* bottle green, used as text */
+  --muted: #5b6a61;
+  --line: #d3dcd4;
+  --garnet: #8c1c34;     /* actions */
+  --garnet-ink: #ffffff;
+  --tag: #f2c14e;        /* shelf-tag yellow: lowest price */
+  --tag-ink: #2a2108;
+  --ok: #2d7a4c;
+  --warn: #9a5b12;
+  --sponsor: #e9efe8;
+  --focus: #1f6fd1;
+  --display: "Gloock", "Georgia", "Times New Roman", serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --r: 6px;
+  color-scheme: light;
+}
+/* Light only, by choice: the app is used in stores and outdoors in bright sun. */
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--paper); color: var(--ink);
+  font: 16px/1.5 var(--body);
+  -webkit-font-smoothing: antialiased; min-height: 100vh;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+[hidden] { display: none !important; }
+a { color: var(--garnet); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.row { display: flex; align-items: center; }
+.gap { gap: 10px; justify-content: center; }
+svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Header */
+.top {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  max-width: 600px; margin: 0 auto;
+  padding-block: calc(16px + env(safe-area-inset-top, 0px)) 8px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.brand { display: flex; gap: 10px; align-items: center; }
+.brand h1 { font: 400 22px/1.1 var(--display); margin: 0; letter-spacing: .2px; }
+.brand p { margin: 0; }
+.logo, .logo-lg { width: 34px; height: 34px; border-radius: 8px; background: url(icons/icon-192.png) center/cover; flex: none; }
+.logo-lg { width: 60px; height: 60px; border-radius: 14px; margin: 0 auto 10px; }
+.badge { font-size: 13px; color: var(--warn); border: 1px solid currentColor; border-radius: 999px; padding: 1px 10px; white-space: nowrap; }
+
+main {
+  max-width: 600px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px;
+  padding-block: 4px 32px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* Finder */
+.finder { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.lede { font: 400 clamp(26px, 7vw, 34px)/1.12 var(--display); margin: 6px 0 4px; text-wrap: balance; }
+.search { display: flex; gap: 8px; }
+.search input {
+  flex: 1; min-width: 0; background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r); padding: 13px 14px; font-size: 17px; outline: none;
+}
+.search input:focus { border-color: var(--ink); }
+.btn {
+  border: 1.5px solid var(--line); background: var(--surface); border-radius: var(--r);
+  padding: 11px 16px; cursor: pointer; font-weight: 700; display: inline-flex; gap: 8px; align-items: center; justify-content: center;
+}
+.btn.primary { background: var(--garnet); border-color: var(--garnet); color: var(--garnet-ink); }
+.btn.block { width: 100%; margin-top: 14px; }
+.btn:disabled { opacity: .5; cursor: default; }
+.scanrow { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.scanrow .btn { border-style: dashed; }
+#scanStatus { flex: 1 1 200px; min-width: 0; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 15px; color: var(--muted); }
+.place { display: inline-flex; gap: 6px; align-items: center; background: none; border: 0; padding: 4px 0; cursor: pointer; color: var(--ink); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; }
+.radius { display: inline-flex; gap: 6px; align-items: center; }
+.radius select { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r); padding: 4px 8px; color: var(--ink); font-weight: 700; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  border: 1.5px solid var(--line); background: transparent; border-radius: 999px;
+  padding: 5px 12px; font-size: 14px; cursor: pointer; color: var(--ink);
+}
+.chip:hover { border-color: var(--ink); }
+
+/* Results */
+#results { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+#results:empty { display: none; }
+.wine { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 16px 14px; }
+.wine h3 { font: 400 22px/1.2 var(--display); margin: 0; text-wrap: balance; }
+.wine .meta { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
+.wine .notes { margin: 8px 0 0; }
+.profile { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font-size: 13px; color: var(--muted); }
+.profile span { display: inline-flex; gap: 6px; align-items: center; }
+.dots { display: inline-flex; gap: 3px; }
+.dots i { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--muted); }
+.dots i.on { background: var(--ink); border-color: var(--ink); }
+
+.where { margin-top: 14px; }
+.status { font-weight: 700; font-size: 15px; margin: 0 0 4px; }
+.status.ok { color: var(--ok); }
+.status.warn { color: var(--warn); }
+.offer { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.offer > div:first-child { min-width: 0; }
+.offer .store { font-weight: 700; color: var(--ink); text-decoration: none; }
+.offer .store:hover { text-decoration: underline; }
+.offer .sub { font-size: 13.5px; color: var(--muted); }
+/* the shelf tag */
+.price {
+  position: relative; white-space: nowrap; font-weight: 700; font-variant-numeric: tabular-nums;
+  padding: 5px 10px 5px 20px; border: 1.5px solid var(--line); border-radius: 3px; font-size: 16px;
+}
+.price::before { content: ""; position: absolute; left: 7px; top: 50%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; border: 1.5px solid currentColor; opacity: .55; }
+.price.none { font-weight: 400; color: var(--muted); border-style: dashed; padding-left: 10px; }
+.price.none::before { display: none; }
+.price.best { background: var(--tag); border-color: var(--tag); color: var(--tag-ink); transform: rotate(-1.5deg); }
+.sub-wine { padding: 10px 0 0; border-top: 1px solid var(--line); }
+.sub-wine .why { font-size: 14px; color: var(--muted); }
+.sub-wine .name { font: 400 18px/1.25 var(--display); margin-top: 2px; }
+
+.pair-line { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 15px; }
+.pair-line b { font-weight: 700; }
+.recipes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.recipe { text-decoration: none; color: var(--ink); font-size: 13px; }
+.recipe img { width: 100%; max-width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 4px; display: block; background: var(--line); }
+.linkbtn { background: none; border: 0; color: var(--garnet); padding: 0; cursor: pointer; font-size: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+
+.empty { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px 16px; }
+.empty p { margin: 4px 0; }
+
+/* Pairing guide */
+.guide { border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); }
+.guide > summary { list-style: none; cursor: pointer; padding: 16px 0; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: center; }
+.guide > summary::-webkit-details-marker { display: none; }
+.guide-title { font: 400 24px/1.15 var(--display); }
+.guide-sub { grid-column: 1; color: var(--muted); font-size: 15px; }
+.chev { grid-column: 2; grid-row: 1 / span 2; width: 28px; height: 28px; border: 1.5px solid var(--line); border-radius: 50%; display: grid; place-items: center; transition: transform .2s; }
+.guide[open] > summary .chev { transform: rotate(180deg); }
+.pairings { display: grid; padding-bottom: 12px; }
+.pair { border-top: 1px solid var(--line); }
+.guide-group { margin: 14px 0 6px; font-size: 14px; font-weight: 700; color: var(--garnet); }
+.guide-group:first-child { margin-top: 0; }
+.pair > summary { list-style: none; cursor: pointer; padding: 12px 0; display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.pair > summary::-webkit-details-marker { display: none; }
+.pair .dish { font-weight: 700; }
+.pair .wines { color: var(--muted); font-size: 14px; text-align: right; }
+.pair .body { padding: 0 0 14px; display: grid; gap: 8px; }
+.pair .body p { margin: 0; max-width: 60ch; }
+.pair[open] .wines { display: none; }
+.grape-list { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Ads (house promos) */
+.ad { background: var(--sponsor); border-radius: var(--r); padding: 12px 14px; font-size: 14.5px; }
+.ad a { color: inherit; text-decoration: none; }
+.tag { font-size: 12.5px; color: var(--muted); margin: 0 0 2px; }
+#adTop { max-width: calc(600px - 32px); margin: 4px auto 0; width: calc(100% - 32px); }
+
+/* Overlays */
+.overlay {
+  position: fixed; inset: 0; background: rgba(15, 25, 19, .55); backdrop-filter: blur(3px);
+  display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 50;
+}
+.sheet { background: var(--surface); border-radius: 12px; padding: 24px 22px; max-width: 360px; width: 100%; box-shadow: 0 12px 40px rgba(10, 20, 14, .25); }
+.sheet.center { text-align: center; }
+.sheet h2 { margin: 2px 0 8px; font: 400 24px/1.2 var(--display); }
+
+.foot { color: var(--muted); font-size: 13.5px; padding-top: 4px; }
+.foot p { margin: 4px 0; max-width: 60ch; }
+
+/* Vendor portal */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; }
+.h2 { font: 400 22px/1.2 var(--display); margin: 0 0 10px; }
+.form { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.form input:not(.vh), .form select, .grid2 > * { min-width: 0; width: 100%; }
+.form label { display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+.form input, .form select {
+  background: var(--paper); border: 1.5px solid var(--line); border-radius: var(--r); padding: 10px 12px; outline: none; color: var(--ink);
+}
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.list-row { display: grid; grid-template-columns: minmax(0, 1fr) 96px auto; gap: 8px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.list-row input[type=number] { width: 100%; background: var(--paper); border: 1.5px solid var(--line); border-radius: var(--r); padding: 7px 8px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.toggle { font-size: 13px; display: inline-flex; gap: 4px; align-items: center; color: var(--muted); }
+.notice { padding: 10px 12px; border-radius: var(--r); font-size: 14px; background: var(--sponsor); }
+.notice.ok { color: var(--ok); }
+.notice.err { color: var(--garnet); }
+.typeahead { border: 1.5px solid var(--line); border-radius: var(--r); overflow: hidden; margin-top: 4px; }
+.typeahead button { display: block; width: 100%; text-align: left; background: var(--surface); border: 0; border-top: 1px solid var(--line); padding: 10px 12px; cursor: pointer; }
+.typeahead button:first-child { border-top: 0; }
+.typeahead button:hover { background: var(--paper); }
+
+/* Contributor page */
+.grid-tight { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+.thumbs:empty { display: none; }
+.thumbs figure { margin: 0; display: grid; gap: 2px; }
+.thumbs img { width: 100%; max-width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 4px; background: var(--line); }
+.list-row.sub-row { grid-template-columns: minmax(0, 1fr) 0 auto; }
+.list-row select { margin-top: 4px; font-size: 13px; padding: 4px 6px; border: 1.5px solid var(--line); border-radius: var(--r); background: var(--paper); color: var(--ink); }
+
+/* Shelf sightings: green while recent; amber "last known" after STALE_AFTER_DAYS (never hidden, no date shown) */
+.offer .sub.seen { color: var(--ok); font-weight: 700; }
+.offer .sub.seen.old { color: var(--warn); }
+.offer.stale { border-left: 3px solid var(--warn); padding-left: 10px; }
+.offer.stale .store { color: var(--muted); }
+/* Found it / Not there */
+.offer .report { margin-top: 4px; font-size: 13.5px; }
+.offer .report .linkbtn { font-size: 13.5px; padding: 6px 2px; white-space: nowrap; }
+
+@media (max-width: 380px) {
+  .grid4 { grid-template-columns: 1fr 1fr; }
+  .search { flex-wrap: wrap; }
+  .search .btn { flex: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chev { transition: none; }
+  .price.none { font-weight: 400; color: var(--muted); border-style: dashed; padding-left: 10px; }
+.price.none::before { display: none; }
+.price.best { transform: none; }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "./",
+  "name": "OB Sommelier — Local Wine Finder",
+  "short_name": "OB Sommelier",
+  "description": "Find where to buy a wine near you in Aruba, at the best price.",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f1f4ef",
+  "theme_color": "#8c1c34",
+  "categories": [
+    "food",
+    "shopping",
+    "lifestyle"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
