@@ -111,6 +111,12 @@
       });
       if (error) throw error;
       rows = data;
+      // Opening hours (stores.hours) for the stores in range; best-effort, results still show without them.
+      const ids = [...new Set(rows.map((r) => r.store_id))];
+      if (ids.length) {
+        const h = await state.sb.from('stores').select('id,hours').in('id', ids);
+        if (!h.error) { const m = new Map(h.data.map((s) => [s.id, s.hours])); rows = rows.map((r) => ({ ...r, hours: m.get(r.store_id) || null })); }
+      }
     } else {
       const cutoff = Date.now() - STALE_DAYS * DAY;
       rows = state.demo.allOffers
@@ -230,6 +236,7 @@
       el('div', null,
         el('a', { href: maps, target: '_blank', rel: 'noopener', class: 'store', text: o.store_name }),
         el('div', { class: 'sub', text: `${km(o.distance_km)} away${o.address ? ', ' + o.address : ''}` }),
+        o.hours ? el('div', { class: 'sub', text: `Open: ${o.hours}` }) : null,
         el('div', { class: shelf ? (isStale(o) ? 'sub seen old' : 'sub seen') : 'sub', text: ago(o) }),
         reportBar(o)),
       el('div', { class: o.price == null ? 'price none' : best ? 'price best' : 'price', 'aria-label': best && o.price != null ? `${money(o)}, lowest price` : money(o) }, money(o)));
