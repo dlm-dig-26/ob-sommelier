@@ -353,6 +353,8 @@
     const res = $('results');
     if (!query.trim()) { res.replaceChildren(); return; }
     res.replaceChildren(el('div', { class: 'empty small muted', text: 'Searching…' }));
+    // A search started while the catalog is still loading waits for it instead of failing silently.
+    try { await state.ready; } catch { renderEmpty('Could not load the wine catalog.', 'Check your connection and reload.'); return; }
     let offers;
     try { offers = await getOffers(); } catch (e) {
       console.error(e); renderEmpty('Could not load store data.', 'Check your connection and try again.'); return;
@@ -565,7 +567,8 @@
 
     await ageGate();
     setupAds();
-    try { await init(); } catch (e) {
+    state.ready = init();
+    try { await state.ready; } catch (e) {
       console.error(e); renderEmpty('Could not load the wine catalog.', 'Check your connection and reload.'); return;
     }
     renderGuide(null);
