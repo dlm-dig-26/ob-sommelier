@@ -75,19 +75,20 @@ main {
 /* Finder */
 .finder { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 .lede { font: 400 clamp(30px, 8.4vw, 40px)/1.08 var(--display); margin: 10px 0 6px; text-wrap: balance; letter-spacing: -.2px; }
-.search { display: flex; gap: 6px; }
+.search { position: relative; display: flex; align-items: center; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r); padding-right: 6px; }
+.band .search { border-color: transparent; }
+.search:focus-within { border-color: var(--ink); }
+.band .search:focus-within { border-color: var(--tag); box-shadow: 0 0 0 1px var(--tag); }
+/* Small square icon buttons at the end of the field: 16 px icons, 36 px tap squares */
+.ibtn { flex: none; width: 36px; height: 36px; display: grid; place-items: center; padding: 0; margin-left: 4px; border: 1.5px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); cursor: pointer; }
+.ibtn .i { width: 16px; height: 16px; stroke-width: 2.2; }
+.ibtn:hover { border-color: var(--ink); }
+.ibtn.go { background: var(--tag); border-color: var(--tag); color: var(--tag-ink); }
+.ibtn.go .i { stroke-width: 2.6; }
 .search input {
-  flex: 1; min-width: 0; background: var(--surface); border: 1.5px solid var(--line);
-  border-radius: var(--r); padding: 13px 14px; font-size: 17px; outline: none;
+  flex: 1; min-width: 0; background: transparent; border: 0; color: var(--ink);
+  padding: 14px 8px 14px 14px; font-size: 17px; outline: none;
 }
-.band .search input { border-color: transparent; color: var(--ink); }
-.search input:focus { border-color: var(--ink); }
-.band .search input:focus { border-color: var(--tag); }
-.btn.sq { width: 50px; padding: 0; flex: none; }
-.btn.sq .i { width: 24px; height: 24px; stroke-width: 2.4; }
-.btn.cam { width: 50px; padding: 0; flex: none; background: transparent; border-color: var(--on-bottle-muted); color: var(--on-bottle); }
-.btn.cam .i { width: 24px; height: 24px; }
-.band .btn.primary { background: var(--tag); border-color: var(--tag); color: var(--tag-ink); }
 .btn {
   border: 1.5px solid var(--line); background: var(--surface); border-radius: var(--r);
   padding: 11px 16px; cursor: pointer; font-weight: 700; display: inline-flex; gap: 8px; align-items: center; justify-content: center;
@@ -102,7 +103,6 @@ main {
 .band .place { color: var(--on-bottle); text-decoration-color: var(--on-bottle-muted); }
 .band .radius select { background: transparent; color: var(--on-bottle); border-color: var(--on-bottle-muted); }
 .band .radius select option { color: var(--ink); }
-.place.pick { flex-basis: 100%; justify-content: flex-start; font-size: 14.5px; }
 .place { display: inline-flex; gap: 6px; align-items: center; background: none; border: 0; padding: 4px 0; cursor: pointer; color: var(--ink); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; }
 .radius { display: inline-flex; gap: 6px; align-items: center; }
 .radius select { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r); padding: 4px 8px; color: var(--ink); font-weight: 700; }
@@ -247,8 +247,6 @@ main {
 
 @media (max-width: 380px) {
   .grid4 { grid-template-columns: 1fr 1fr; }
-  .search { flex-wrap: wrap; }
-  .search .btn { flex: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
   .chev { transition: none; }

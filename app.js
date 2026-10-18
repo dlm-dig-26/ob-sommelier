@@ -707,12 +707,10 @@
     $('searchForm').addEventListener('submit', (e) => { e.preventDefault(); $('q').blur(); toastScan(''); runSearch($('q').value, 'text'); });
     $('radius').addEventListener('change', (e) => setRadius(e.target.value));
     $('locBtn').addEventListener('click', () => locate(false));
-    // The button opens the phone camera through the file picker (no separate camera permission needed).
+    // One button, no `capture` attribute: the phone asks "Take photo" or "Photo library / Files",
+    // so shoppers can scan a bottle or use a photo they already have. No camera permission needed.
     $('scanBtn').addEventListener('click', () => { toastScan(''); $('scanInput').click(); });
-    $('scanInput').addEventListener('change', (e) => handleScan(e.target.files[0]));
-    // Same label reader for a photo already on the phone (gallery / files, no camera).
-    $('pickBtn').addEventListener('click', () => { toastScan(''); $('pickInput').click(); });
-    $('pickInput').addEventListener('change', (e) => { handleScan(e.target.files[0]).finally(() => { e.target.value = ''; }); });
+    $('scanInput').addEventListener('change', (e) => { const f = e.target.files[0]; if (f) handleScan(f).finally(() => { e.target.value = ''; }); });
     $('interstitialClose').addEventListener('click', () => { $('interstitial').hidden = true; });
     $('suggest').replaceChildren(el('span', { class: 'chips-lead', text: 'Often searched' }), ...['Cabernet', 'Malbec', 'Pinot Noir', 'Sauvignon Blanc', 'Prosecco', 'Rosé'].map((s) =>
       el('button', { class: 'chip', type: 'button', text: s, onclick: () => { $('q').value = s; runSearch(s, 'text'); } })));

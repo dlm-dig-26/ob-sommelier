@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@600&family=Gloock&display=swap" />
-  <link rel="stylesheet" href="styles.css?v=20261018c" />
+  <link rel="stylesheet" href="styles.css?v=20261018d" />
 </head>
 <body>
   <!-- AGE GATE -->
@@ -56,10 +56,10 @@
     <h2 id="finderTitle" class="lede">Which wine are you looking for?</h2>
     <form id="searchForm" class="search" autocomplete="off" role="search">
       <input id="q" type="search" placeholder="Name, producer or grape" aria-label="Wine name, producer or grape" enterkeyhint="search" />
-      <button id="scanBtn" class="btn cam" type="button" aria-label="Scan a label with the camera" title="Scan a label">
+      <button id="scanBtn" class="ibtn" type="button" aria-label="Scan a label: take a photo or choose one" title="Scan a label">
         <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
       </button>
-      <button class="btn primary sq" type="submit" aria-label="Search" title="Search">
+      <button class="ibtn go" type="submit" aria-label="Search" title="Search">
         <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>
       </button>
     </form>
@@ -76,12 +76,10 @@
           <option value="40">the whole island</option>
         </select>
       </label>
-      <button id="pickBtn" class="place pick" type="button">Use a photo of a label</button>
     </div>
     <span id="scanStatus" class="small scan-status" hidden></span>
   </section>
-  <input id="scanInput" class="vh" type="file" accept="image/*" capture="environment" tabindex="-1" aria-hidden="true" />
-  <input id="pickInput" class="vh" type="file" accept="image/*" tabindex="-1" aria-hidden="true" />
+  <input id="scanInput" class="vh" type="file" accept="image/*" tabindex="-1" aria-hidden="true" />
   </div>
 
   <main>
@@ -109,7 +107,7 @@
     </footer>
   </main>
 
-  <script src="config.js?v=20261018c"></script>
-  <script src="app.js?v=20261018c"></script>
+  <script src="config.js?v=20261018d"></script>
+  <script src="app.js?v=20261018d"></script>
 </body>
 </html>
