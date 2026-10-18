@@ -228,3 +228,4 @@ main {
 .price.none::before { display: none; }
 .price.best { transform: none; }
 }
+.price-note { margin: 12px 0 4px; max-width: 60ch; font-size: 13px; }

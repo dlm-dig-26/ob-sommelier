@@ -10,6 +10,7 @@
   const LIVE = !!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY);
   const CENTER = CFG.DEFAULT_CENTER || { lat: 12.5186, lng: -70.0358, label: 'Oranjestad' };
   const STALE_DAYS = CFG.STALE_AFTER_DAYS || 30;
+  const PRICE_DAYS = CFG.PRICE_VALID_DAYS || 90; // a price is shown only if confirmed (photo, price list, store) within this window
   const ISLAND_KM = 40;
   const DAY = 86400000;
   const SUPABASE_JS = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
@@ -123,8 +124,8 @@
   async function fetchOffers(radius) {
     let rows;
     if (LIVE) {
-      const { data, error } = await state.sb.rpc('nearby_offers_v3', {
-        p_lat: state.pos.lat, p_lng: state.pos.lng, p_radius_km: radius, p_stale_days: STALE_DAYS
+      const { data, error } = await state.sb.rpc('nearby_offers_v4', {
+        p_lat: state.pos.lat, p_lng: state.pos.lng, p_radius_km: radius, p_price_days: PRICE_DAYS
       });
       if (error) throw error;
       rows = data;
@@ -307,7 +308,7 @@
   // Rank on price per 750 ml, so a 1.5 L bottle is compared fairly with a standard bottle.
   const priceKey = (o) => (o.price == null ? Infinity : o.price * 750 / (o.size_ml || 750));
   // A shelf sighting older than STALE_DAYS stays visible as "last known" (different colour, no date).
-  const isStale = (o) => o.source === 'shelf' && Date.now() - Date.parse(o.last_confirmed) > STALE_DAYS * DAY;
+  const isStale = (o) => Date.now() - Date.parse(o.last_confirmed) > STALE_DAYS * DAY;
   const rankOffers = (list) => [...list].sort((a, b) => isStale(a) - isStale(b) || priceKey(a) - priceKey(b) || a.distance_km - b.distance_km);
 
   // ---------- Rendering ----------
@@ -321,9 +322,11 @@
   function ago(o) {
     if (o.source === 'shelf') {
       const seen = isStale(o) ? 'Last known location, may no longer be in stock' : 'Seen on the shelf recently';
+      if (o.price_expired) return `${seen}. Shelf price older than ${PRICE_DAYS} days, not shown`;
       return o.price != null ? `${seen}. Price from the shelf tag` : seen;
     }
-    const d = Math.floor((Date.now() - Date.parse(o.last_confirmed)) / DAY);
+    if (o.price_expired) return `Price older than ${PRICE_DAYS} days, not shown`;
+    const d = Math.floor((Date.now() - Date.parse(o.price_confirmed_at || o.last_confirmed)) / DAY);
     const when = d <= 0 ? 'today' : d === 1 ? 'yesterday' : `${d} days ago`;
     // Prices we read from a store's own website are not store-confirmed; say so.
     if (o.source === 'agent') return `Price from the store’s website, checked ${when}`;
@@ -482,6 +485,7 @@
   async function runSearch(query, source = 'text') {
     state.lastQuery = query; state.lastSource = source;
     const res = $('results');
+    $('priceNote').hidden = !query.trim();
     if (!query.trim()) { res.replaceChildren(); return; }
     res.replaceChildren(el('div', { class: 'empty small muted', text: 'Searching…' }));
     // A search started while the catalog is still loading waits for it instead of failing silently.

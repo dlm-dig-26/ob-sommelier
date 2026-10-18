@@ -121,9 +121,9 @@
     const head = card(
       el('h2', { class: 'h2', text: current.name }), picker,
       el('p', { class: 'small muted', text: `${listings.length} wines listed on the ${current.plan} plan.${current.is_active ? '' : ' Your store is hidden from shoppers.'}` }),
-      oldest > 20 ? notice(`Some prices were last confirmed ${oldest} days ago. Listings older than ${CFG.STALE_AFTER_DAYS || 30} days are hidden from shoppers.`, 'err') : null,
+      oldest > 75 ? notice(`Some prices were last confirmed ${oldest} days ago. Prices not confirmed for ${CFG.PRICE_VALID_DAYS || 90} days are hidden from shoppers.`, 'err') : null,
       el('button', { class: 'btn primary block', type: 'button', text: 'Confirm all prices and stock are current', onclick: async () => {
-        const { error: e } = await sb.from('listings').update({ in_stock: true }).eq('store_id', current.id).eq('in_stock', true);
+        const { error: e } = await sb.from('listings').update({ in_stock: true, price_confirmed_at: new Date().toISOString() }).eq('store_id', current.id).eq('in_stock', true);
         if (e) return fail(e); flash('All in-stock listings confirmed.', 'ok'); renderStore();
       } }));
 
