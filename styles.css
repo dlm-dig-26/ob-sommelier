@@ -202,6 +202,7 @@ main {
 
 .foot { color: var(--muted); font-size: 13.5px; padding-top: 4px; }
 .foot p { margin: 4px 0; max-width: 60ch; }
+.foot .about { color: var(--ink); margin-bottom: 10px; }
 
 /* Vendor portal */
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; }
