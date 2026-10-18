@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /vendor.html
+Disallow: /contribute.html
+Sitemap: https://dlm-dig-26.github.io/ob-sommelier/sitemap.xml
