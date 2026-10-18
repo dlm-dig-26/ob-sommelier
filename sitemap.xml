@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/privacy.html</loc><lastmod>2026-10-18</lastmod></url>
-  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/</loc><lastmod>2026-10-18</lastmod></url>
-  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/store/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/19-crimes-cali-red/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/19-crimes-cali-sweet/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/19-crimes-frankenstein-cabernet-sauvignon/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/19-crimes-the-banished-dark-red/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/apothic-cabernet-sauvignon/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/apothic-crush/</loc><lastmod>2026-10-18</lastmod></url>
@@ -27,6 +26,7 @@
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/barefoot-sweet-red-blend/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/barefoot-white-zinfandel/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/beringer-bros-bourbon-barrel-aged-chardonnay/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/beringer-main-and-vine-cabernet-sauvignon/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/bottega-gold-prosecco/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/bottega-pink-gold/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/bottega-rose-gold/</loc><lastmod>2026-10-18</lastmod></url>
@@ -58,12 +58,15 @@
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/chandon-brut/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/chandon-garden-spritz/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/chandon-rose/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/chico-malo-blanco-dulce/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/cupcake-cabernet-sauvignon/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/cupcake-chardonnay/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/cupcake-merlot/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/cupcake-pinot-grigio/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/cupcake-pinot-noir/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/cupcake-prosecco/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/cuvelier-los-andes-merlot/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/cuvelier-los-andes-rose/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/dark-horse-cabernet-sauvignon/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/dark-horse-merlot/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/dark-horse-pinot-grigio/</loc><lastmod>2026-10-18</lastmod></url>
@@ -75,6 +78,7 @@
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/diablo-dark-red/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/dona-paula-estate-riesling/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/dona-paula-estate-sauvignon-blanc/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/felipe-rutini/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/festivo-malbec/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/frontera-cabernet-sauvignon/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/frontera-chardonnay/</loc><lastmod>2026-10-18</lastmod></url>
@@ -95,6 +99,7 @@
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/josh-cellars-merlot/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/josh-cellars-pinot-noir/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/josh-cellars-reserve-north-coast-cabernet-sauvignon/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/la-vieille-ferme-rouge/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/las-perdices-ala-colorada-ancellotta/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/las-perdices-bonarda-reserva/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/las-perdices-cabernet-sauvignon/</loc><lastmod>2026-10-18</lastmod></url>
@@ -105,6 +110,7 @@
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/las-perdices-sauvignon-blanc/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/lunetta-prosecco/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/lunetta-prosecco-rose/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/marcelo-pelleriti-blend-of-terroir-reserva/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/marques-de-caceres-rioja-crianza/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/meiomi-cabernet-sauvignon/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/meiomi-chardonnay/</loc><lastmod>2026-10-18</lastmod></url>
@@ -120,8 +126,12 @@
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/moet-and-chandon-ice-imperial/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/moet-and-chandon-ice-imperial-rose/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/moet-and-chandon-imperial-brut/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/noble-vines-337-cabernet-sauvignon/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/opera-prima-blue-moscato/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/proyecto-las-compuertas-criolla/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/proyecto-las-compuertas-malbec-5-suelos/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/red-diamond-cabernet-sauvignon/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/reservado-merlot/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/robert-mondavi-private-selection-cabernet-sauvignon/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/robert-mondavi-private-selection-merlot/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/ruffino-chianti/</loc><lastmod>2026-10-18</lastmod></url>
@@ -134,8 +144,10 @@
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/rutini-encuentro-malbec/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/rutini-single-vineyard-cabernet-franc/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/rutini-single-vineyard-gualtallary-malbec/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/san-felipe-extra-brut/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/santa-margherita-pinot-grigio/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/santa-margherita-rose/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/santa-rita-120-cabernet-sauvignon/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/santa-rita-3-medallas-cabernet-sauvignon/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/santa-rita-3-medallas-merlot/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/santa-rita-3-medallas-sauvignon-blanc/</loc><lastmod>2026-10-18</lastmod></url>
@@ -169,4 +181,6 @@
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/store/flores-supermarket/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/store/heng-sheng-supermarket/</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://dlm-dig-26.github.io/ob-sommelier/store/hodgson-trading-hq-showroom/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/wine/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://dlm-dig-26.github.io/ob-sommelier/store/</loc><lastmod>2026-10-18</lastmod></url>
 </urlset>
