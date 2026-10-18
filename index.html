@@ -6,15 +6,15 @@
   <title>OB Sommelier</title>
   <meta name="description" content="Find where to buy a wine near you in Aruba, at the best price, and what to eat with it." />
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#8c1c34" />
+  <meta name="theme-color" content="#173a2b" />
   <link rel="icon" href="icons/icon-192.png" type="image/png" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="OB Sommelier" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Gloock&display=swap" />
-  <link rel="stylesheet" href="styles.css?v=20261018a" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@600&family=Gloock&display=swap" />
+  <link rel="stylesheet" href="styles.css?v=20261018b" />
 </head>
 <body>
   <!-- AGE GATE -->
@@ -43,6 +43,7 @@
     </div>
   </div>
 
+  <div class="band">
   <header class="top">
     <div class="brand">
       <div class="logo" aria-hidden="true"></div>
@@ -51,44 +52,39 @@
     <span id="modeBadge" class="badge" hidden>Demo data</span>
   </header>
 
-  <div id="adTop" class="ad" hidden></div>
+  <section class="finder" aria-labelledby="finderTitle">
+    <h2 id="finderTitle" class="lede">Which wine are you looking for?</h2>
+    <form id="searchForm" class="search" autocomplete="off" role="search">
+      <input id="q" type="search" placeholder="Name, producer or grape" aria-label="Wine name, producer or grape" enterkeyhint="search" />
+      <button id="scanBtn" class="btn cam" type="button" aria-label="Scan a label with the camera" title="Scan a label">
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+      </button>
+      <button class="btn primary" type="submit">Search</button>
+    </form>
+    <input id="scanInput" class="vh" type="file" accept="image/*" capture="environment" tabindex="-1" aria-hidden="true" />
+    <input id="pickInput" class="vh" type="file" accept="image/*" tabindex="-1" aria-hidden="true" />
+    <div class="controls">
+      <button id="locBtn" class="place" type="button">
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg>
+        <span>Shops near <span id="locLabel">Oranjestad</span></span>
+      </button>
+      <label class="radius" for="radius">within
+        <select id="radius">
+          <option value="5">5 km</option>
+          <option value="10">10 km</option>
+          <option value="20">20 km</option>
+          <option value="40">the whole island</option>
+        </select>
+      </label>
+      <button id="pickBtn" class="place pick" type="button">Use a photo of a label</button>
+    </div>
+    <span id="scanStatus" class="small scan-status" hidden></span>
+  </section>
+  </div>
 
   <main>
-    <section class="finder" aria-labelledby="finderTitle">
-      <h2 id="finderTitle" class="lede">Which wine are you looking for?</h2>
-      <form id="searchForm" class="search" autocomplete="off" role="search">
-        <input id="q" type="search" placeholder="Name, producer or grape" aria-label="Wine name, producer or grape" enterkeyhint="search" />
-        <button class="btn primary" type="submit">Search</button>
-      </form>
-      <div class="scanrow">
-        <input id="scanInput" class="vh" type="file" accept="image/*" capture="environment" tabindex="-1" aria-hidden="true" />
-        <input id="pickInput" class="vh" type="file" accept="image/*" tabindex="-1" aria-hidden="true" />
-        <button id="scanBtn" class="btn" type="button">
-          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
-          Scan a label
-        </button>
-        <button id="pickBtn" class="btn" type="button">
-          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg>
-          Choose a photo
-        </button>
-        <span id="scanStatus" class="small muted" hidden></span>
-      </div>
-      <div class="controls">
-        <button id="locBtn" class="place" type="button">
-          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg>
-          <span>Near <span id="locLabel">Oranjestad</span></span>
-        </button>
-        <label class="radius" for="radius">within
-          <select id="radius">
-            <option value="5">5 km</option>
-            <option value="10">10 km</option>
-            <option value="20">20 km</option>
-            <option value="40">the whole island</option>
-          </select>
-        </label>
-      </div>
-      <div id="suggest" class="chips" aria-label="Popular searches"></div>
-    </section>
+    <div id="suggest" class="chips" aria-label="Popular searches"></div>
+    <div id="adTop" class="ad" hidden></div>
 
     <section id="results" aria-live="polite"></section>
     <p id="priceNote" class="small muted price-note" hidden>Prices are valid for 90 days from when they were last confirmed by a shelf photo, a store price list or the store itself. After 90 days a price is no longer shown until a new photo updates it. Prices can change at any time; check at the store.</p>
@@ -105,13 +101,13 @@
     <div id="adBottom" class="ad" hidden></div>
 
     <footer class="foot">
-      <p>Prices and stock come from stores, shoppers and shelf photos, and can change. A price is shown for 90 days after it was last confirmed; a listing not confirmed for <span id="staleDays">30</span> days turns amber (“last known”). At the store? Tap “Found it” or “Not there” to keep it accurate.</p>
+      <p>Prices and stock come from stores, shoppers and shelf photos. A store not confirmed for <span id="staleDays">30</span> days turns amber (“last known”). At the store? Tap “Found it” or “Not there” to keep it accurate.</p>
       <p>Own a store? <a href="vendor.html">List your wines</a>. Helping us map shelves? <a href="contribute.html">Contributor sign-in</a>.</p>
       <p><a href="privacy.html">Privacy and terms</a>. Recipes from TheMealDB. Please drink responsibly.</p>
     </footer>
   </main>
 
-  <script src="config.js?v=20261018a"></script>
-  <script src="app.js?v=20261018a"></script>
+  <script src="config.js?v=20261018b"></script>
+  <script src="app.js?v=20261018b"></script>
 </body>
 </html>

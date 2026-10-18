@@ -351,9 +351,17 @@
         el('a', { href: maps, target: '_blank', rel: 'noopener', class: 'store', text: o.store_name }),
         el('div', { class: 'sub', text: `${km(o.distance_km)} away${o.address ? ', ' + o.address : ''}` }),
         o.hours ? el('div', { class: 'sub', text: `Open: ${o.hours}` }) : null,
-        el('div', { class: shelf ? (isStale(o) ? 'sub seen old' : 'sub seen') : 'sub', text: ago(o) }),
-        reportBar(o)),
-      el('div', { class: o.price == null ? 'price none' : best ? 'price best' : 'price', 'aria-label': best && o.price != null ? `${money(o)}, lowest price` : money(o) }, money(o)));
+        el('div', { class: shelf ? (isStale(o) ? 'sub seen old' : 'sub seen') : 'sub', text: ago(o) })),
+      priceTag(o, best),
+      reportBar(o));
+  }
+  // The shelf tag: currency small, amount in printed condensed numerals, bottle size under it when not 750 ml.
+  function priceTag(o, best) {
+    if (o.price == null) return el('div', { class: 'price none', text: 'No price' });
+    return el('div', { class: best ? 'price best' : 'price', role: 'img', 'aria-label': best ? `${money(o)}, lowest price` : money(o) },
+      el('span', { class: 'cur', text: o.currency === 'USD' ? 'US$' : 'Afl.' }),
+      el('span', { class: 'amt', text: o.price.toFixed(2) }),
+      o.size_ml && o.size_ml !== 750 ? el('span', { class: 'size', text: sizeLabel(o.size_ml) }) : null);
   }
 
   // ---------- Shopper reports: "Found it" / "Not there" (must be at the store) ----------
@@ -394,9 +402,9 @@
       }, () => done('Allow location for this site to report from the store.'),
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
     };
-    bar.append(el('span', { class: 'small muted', text: 'At the store? ' }),
-      el('button', { class: 'linkbtn', type: 'button', text: 'Found it', onclick: () => send('found') }), ' · ',
-      el('button', { class: 'linkbtn', type: 'button', text: 'Not there', onclick: () => send('missing') }));
+    bar.append(el('span', { class: 'small muted', text: 'At the store?' }),
+      el('button', { class: 'rbtn', type: 'button', text: 'Found it', onclick: () => send('found') }),
+      el('button', { class: 'rbtn', type: 'button', text: 'Not there', onclick: () => send('missing') }));
     return bar;
   }
 
@@ -706,7 +714,7 @@
     $('pickBtn').addEventListener('click', () => { toastScan(''); $('pickInput').click(); });
     $('pickInput').addEventListener('change', (e) => { handleScan(e.target.files[0]).finally(() => { e.target.value = ''; }); });
     $('interstitialClose').addEventListener('click', () => { $('interstitial').hidden = true; });
-    $('suggest').replaceChildren(...['Cabernet', 'Malbec', 'Pinot Noir', 'Sauvignon Blanc', 'Prosecco', 'Rosé'].map((s) =>
+    $('suggest').replaceChildren(el('span', { class: 'chips-lead', text: 'Often searched' }), ...['Cabernet', 'Malbec', 'Pinot Noir', 'Sauvignon Blanc', 'Prosecco', 'Rosé'].map((s) =>
       el('button', { class: 'chip', type: 'button', text: s, onclick: () => { $('q').value = s; runSearch(s, 'text'); } })));
 
     await ageGate();
