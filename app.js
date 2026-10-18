@@ -723,6 +723,9 @@
     }
     renderGuide(null);
     if (store.get('ob.geoOk', false)) locate(true);
+    // Deep link from the public wine pages: ?q=<wine name> runs that search straight away.
+    const q0 = (new URLSearchParams(location.search).get('q') || '').trim().slice(0, 120);
+    if (q0) { $('q').value = q0; runSearch(q0, 'text'); }
   }
   boot();
 })();
