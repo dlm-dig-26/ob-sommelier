@@ -83,6 +83,8 @@ main {
 .band .search input { border-color: transparent; color: var(--ink); }
 .search input:focus { border-color: var(--ink); }
 .band .search input:focus { border-color: var(--tag); }
+.btn.sq { width: 50px; padding: 0; flex: none; }
+.btn.sq .i { width: 24px; height: 24px; stroke-width: 2.4; }
 .btn.cam { width: 50px; padding: 0; flex: none; background: transparent; border-color: var(--on-bottle-muted); color: var(--on-bottle); }
 .btn.cam .i { width: 24px; height: 24px; }
 .band .btn.primary { background: var(--tag); border-color: var(--tag); color: var(--tag-ink); }
