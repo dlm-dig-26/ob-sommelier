@@ -1,5 +1,5 @@
 // Bump VERSION on every release; old caches are deleted on activate.
-const VERSION = 'ob-20261017g';
+const VERSION = 'ob-20261017h';
 // Paths are relative to this file, so the app works at a domain root or a sub-path (GitHub Pages).
 const CORE = ['./', 'index.html', 'styles.css', 'app.js', 'config.js', 'manifest.json',
   'data/demo.json', 'icons/icon-192.png', 'vendor.html', 'vendor.js', 'contribute.html', 'contribute.js', 'privacy.html'];

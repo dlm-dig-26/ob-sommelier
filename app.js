@@ -10,6 +10,7 @@
   const LIVE = !!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY);
   const CENTER = CFG.DEFAULT_CENTER || { lat: 12.5186, lng: -70.0358, label: 'Oranjestad' };
   const STALE_DAYS = CFG.STALE_AFTER_DAYS || 30;
+  const ISLAND_KM = 40;
   const DAY = 86400000;
   const SUPABASE_JS = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
   const TESSERACT_JS = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
@@ -101,13 +102,29 @@
     state.wines.forEach((w) => { w._idx = indexWine(w); state.winesById.set(w.id, w); });
   }
 
+  // Whole-island offers, used for "closest taste" suggestions when nothing fits within the radius.
+  async function getIslandOffers() {
+    if (state.radius >= ISLAND_KM) return getOffers();
+    const key = `${state.pos.lat.toFixed(4)},${state.pos.lng.toFixed(4)},island`;
+    if (key === state.islandKey) return state.islandOffers;
+    state.islandOffers = await fetchOffers(ISLAND_KM);
+    state.islandKey = key;
+    return state.islandOffers;
+  }
+
   async function getOffers() {
     const key = `${state.pos.lat.toFixed(4)},${state.pos.lng.toFixed(4)},${state.radius}`;
     if (key === state.offersKey) return state.offers;
+    state.offers = await fetchOffers(state.radius);
+    state.offersKey = key;
+    return state.offers;
+  }
+
+  async function fetchOffers(radius) {
     let rows;
     if (LIVE) {
       const { data, error } = await state.sb.rpc('nearby_offers_v3', {
-        p_lat: state.pos.lat, p_lng: state.pos.lng, p_radius_km: state.radius, p_stale_days: STALE_DAYS
+        p_lat: state.pos.lat, p_lng: state.pos.lng, p_radius_km: radius, p_stale_days: STALE_DAYS
       });
       if (error) throw error;
       rows = data;
@@ -122,11 +139,9 @@
       rows = state.demo.allOffers
         .filter((o) => o.source === 'shelf' || Date.parse(o.last_confirmed) >= cutoff) // shelf sightings never expire
         .map((o) => ({ ...o, distance_km: haversineKm(state.pos, o) }))
-        .filter((o) => o.distance_km <= state.radius);
+        .filter((o) => o.distance_km <= radius);
     }
-    state.offers = rows.map((o) => ({ ...o, price: o.price == null ? null : Number(o.price), distance_km: Number(o.distance_km), source: o.source || 'vendor', size_ml: Number(o.size_ml) || 750 }));
-    state.offersKey = key;
-    return state.offers;
+    return rows.map((o) => ({ ...o, price: o.price == null ? null : Number(o.price), distance_km: Number(o.distance_km), source: o.source || 'vendor', size_ml: Number(o.size_ml) || 750 }));
   }
 
   function logSearch(query, wineId, foundNearby, source) {
@@ -198,6 +213,97 @@
     const close = ['body', 'sweetness', 'acidity', 'tannin'].filter((k) => Math.abs((a[k] || 3) - (b[k] || 3)) <= 1);
     return close.length >= 3 ? `Similar body and taste, made from ${b.varietal}` : `Closest style in stock, made from ${b.varietal}`;
   }
+  // ---------- Taste guess for wines we don't know yet ----------
+  // [words in the query, varietal as stored in the catalog, colour, body, sweetness, acidity, tannin]
+  // Regions/appellations map to their main grape (Rioja → Tempranillo, Chablis → Chardonnay...).
+  const TASTE = [
+    ['white zinfandel|white zin', 'White Zinfandel', 'rose', 2, 3, 3, 1],
+    ['cabernet sauvignon|cab sauv|cabernet', 'Cabernet Sauvignon', 'red', 4, 1, 3, 4],
+    ['cabernet franc|cab franc', 'Cabernet Franc', 'red', 3, 1, 4, 3],
+    ['pinot noir|pinot nero|bourgogne rouge|burgundy|bourgogne', 'Pinot Noir', 'red', 2, 1, 4, 2],
+    ['sauvignon blanc|sancerre|marlborough|pouilly fume', 'Sauvignon Blanc', 'white', 2, 1, 5, 1],
+    ['pinot grigio|pinot gris', 'Pinot Grigio', 'white', 2, 1, 4, 1],
+    ['red blend|tinto|rouge|rosso', 'Red blend', 'red', 4, 2, 3, 3],
+    ['merlot', 'Merlot', 'red', 3, 1, 3, 3],
+    ['malbec|mendoza', 'Malbec', 'red', 4, 1, 3, 3],
+    ['shiraz|syrah|barossa', 'Shiraz', 'red', 4, 1, 3, 3],
+    ['zinfandel|primitivo', 'Zinfandel', 'red', 4, 2, 3, 3],
+    ['tempranillo|rioja|ribera', 'Tempranillo', 'red', 3, 1, 3, 3],
+    ['sangiovese|chianti|brunello|montepulciano', 'Sangiovese', 'red', 3, 1, 4, 3],
+    ['nebbiolo|barolo|barbaresco', 'Nebbiolo', 'red', 4, 1, 4, 5],
+    ['carmenere', 'Carmenère', 'red', 3, 1, 3, 3],
+    ['grenache|garnacha|cotes du rhone|chateauneuf', 'Grenache', 'red', 3, 1, 3, 2],
+    ['valpolicella|ripasso|amarone|corvina', 'Corvina blend', 'red', 4, 1, 3, 3],
+    ['tannat', 'Tannat', 'red', 5, 1, 3, 5],
+    ['bonarda', 'Bonarda', 'red', 4, 1, 3, 3],
+    ['bordeaux|medoc|saint emilion', 'Cabernet Sauvignon', 'red', 4, 1, 3, 4],
+    ['napa', 'Cabernet Sauvignon', 'red', 4, 1, 3, 4],
+    ['lambrusco', 'Lambrusco', 'red', 2, 3, 3, 2],
+    ['chardonnay|chablis|meursault|pouilly fuisse', 'Chardonnay', 'white', 3, 1, 3, 1],
+    ['riesling', 'Riesling', 'white', 2, 3, 4, 1],
+    ['moscato|muscat|moscatel', 'Moscato', 'white', 2, 4, 3, 1],
+    ['torrontes', 'Torrontés', 'white', 2, 2, 3, 1],
+    ['viognier', 'Viognier', 'white', 3, 1, 3, 1],
+    ['albarino|alvarinho|vinho verde', 'Albariño', 'white', 2, 1, 4, 1],
+    ['blanc|bianco|blanco|white', 'White blend', 'white', 2, 1, 4, 1],
+    ['rose|rosado|rosato|provence', 'Rosé', 'rose', 2, 2, 4, 1],
+    ['prosecco|cava|champagne|brut|espumante|sparkling|cremant|spumante', 'Sparkling', 'sparkling', 2, 1, 4, 1],
+    ['port|porto|oporto', 'Port', 'dessert', 5, 5, 3, 3]
+  ];
+  // Returns a pretend wine with the typical profile of the grape/region named in the query, or null.
+  function guessProfile(query) {
+    const q = ` ${norm(query)} `;
+    for (const [words, varietal, color, body, sweetness, acidity, tannin] of TASTE) {
+      const hit = words.split('|').find((wd) => q.includes(` ${wd} `));
+      if (hit) {
+        const sweet = /\b(sweet|dulce|doux|dolce|semi seco)\b/.test(q) ? Math.max(sweetness, 4) : sweetness;
+        return { id: 'guess', name: query, varietal, color, body, sweetness: sweet, acidity, tannin, _from: varietal };
+      }
+    }
+    return null;
+  }
+  // Is the best text match really the wine that was asked for? A fuzzy hit on shared words
+  // ("Cloudy Bay Sauvignon Blanc" → "Oyster Bay Sauvignon Blanc") must not be shown as that wine.
+  // Every distinctive word (brand, cuvée) must appear in the wine, and a named grape must be its grape.
+  const GENERIC = new Set(TASTE.flatMap((t) => t[0].split('|').flatMap((p) => p.split(' ')))
+    .concat('classico superiore doc docg aoc igt dop selection seleccion vintage old vines'.split(' ')));
+  function isExactHit(query, w) {
+    const words = new Set(w._idx.keys());
+    const has = (u) => words.has(u) || [...words].some((t) => (t.length >= 4 && u.length >= 4 && (t.startsWith(u) || u.startsWith(t))) || (t.length >= 5 && editDist1(t, u)));
+    if (!tokens(query).filter((u) => !GENERIC.has(u)).every(has)) return false;
+    const g = guessProfile(query);
+    if (!g || ['Red blend', 'White blend', 'Rosé', 'Sparkling'].includes(g.varietal)) return true;
+    const text = ` ${norm(`${w.name} ${w.varietal || ''} ${w.region || ''}`)} `;
+    const words2 = TASTE.find((t) => t[1] === g.varietal)[0].split('|');
+    return norm(w.varietal) === norm(g.varietal) || words2.some((wd) => text.includes(` ${wd} `));
+  }
+
+  // Closest wines in stock: within the radius first; if none there, the whole island.
+  function closestInStock(w, near, island, n) {
+    const pick = (offers) => {
+      const ids = new Set(offers.map((o) => o.wine_id));
+      return state.wines.filter((x) => ids.has(x.id))
+        .map((x) => ({ x, s: similarity(w, x) })).filter((r) => r.s >= 4)
+        .sort((a, b) => b.s - a.s).slice(0, n)
+        .map(({ x }) => ({ x, best: rankOffers(offers.filter((o) => o.wine_id === x.id))[0] }));
+    };
+    const local = pick(near);
+    return local.length ? { list: local, island: false } : { list: pick(island), island: true };
+  }
+  function suggestionBlock(w, near, island, n) {
+    const { list, island: wide } = closestInStock(w, near, island, n);
+    if (!list.length) return [];
+    return [
+      ...(wide && state.radius < ISLAND_KM ? [el('p', { class: 'small muted', text: `Nothing similar within ${radiusLabel()}; closest on the island:` })] : []),
+      ...list.flatMap(({ x, best }) => [
+        el('div', { class: 'sub-wine' },
+          el('div', { class: 'why', text: `Try instead. ${reasonFor(w, x)}:` }),
+          el('div', { class: 'name', text: x.name }),
+          el('div', { class: 'small muted', text: x.flavor_notes || describe(x) })),
+        offerRow(best, best.price != null && !isStale(best))])
+    ];
+  }
+
   // Rank on price per 750 ml, so a 1.5 L bottle is compared fairly with a standard bottle.
   const priceKey = (o) => (o.price == null ? Infinity : o.price * 750 / (o.size_ml || 750));
   // A shelf sighting older than STALE_DAYS stays visible as "last known" (different colour, no date).
@@ -218,7 +324,10 @@
       return o.price != null ? `${seen}. Price from the shelf tag` : seen;
     }
     const d = Math.floor((Date.now() - Date.parse(o.last_confirmed)) / DAY);
-    return `price confirmed ${d <= 0 ? 'today' : d === 1 ? 'yesterday' : `${d} days ago`}`;
+    const when = d <= 0 ? 'today' : d === 1 ? 'yesterday' : `${d} days ago`;
+    // Prices we read from a store's own website are not store-confirmed; say so.
+    if (o.source === 'agent') return `Price from the store’s website, checked ${when}`;
+    return `price confirmed ${when}`;
   }
   const dots = (n) => el('span', { class: 'dots', role: 'img', 'aria-label': `${n} out of 5` },
     [1, 2, 3, 4, 5].map((i) => el('i', { class: i <= n ? 'on' : '' })));
@@ -288,7 +397,7 @@
     return bar;
   }
 
-  function wineCard(w, offers, allOffers) {
+  function wineCard(w, offers, allOffers, island = allOffers) {
     const mine = rankOffers(offers.filter((o) => o.wine_id === w.id));
     const card = el('article', { class: 'wine' },
       el('h3', { text: w.name }),
@@ -309,30 +418,22 @@
       where.append(status,
         ...mine.map((o, i) => offerRow(o, i === 0 && o.price != null && !isStale(o))));
     } else {
-      // Fallback: most similar wines that ARE available within the radius.
-      const availIds = new Set(allOffers.map((o) => o.wine_id));
-      const subs = state.wines
-        .filter((x) => availIds.has(x.id))
-        .map((x) => ({ x, s: similarity(w, x) }))
-        .filter((r) => r.s >= 4)
-        .sort((a, b) => b.s - a.s)
-        .slice(0, 2);
-      where.append(el('p', { class: 'status warn', text: `No store within ${radiusLabel()} has it right now.` }));
-      if (subs.length) {
-        subs.forEach(({ x }) => {
-          const best = rankOffers(allOffers.filter((o) => o.wine_id === x.id))[0];
-          where.append(el('div', { class: 'sub-wine' },
-            el('div', { class: 'why', text: `Try instead. ${reasonFor(w, x)}:` }),
-            el('div', { class: 'name', text: x.name }),
-            el('div', { class: 'small muted', text: x.flavor_notes || '' })),
-          offerRow(best, best.price != null && !isStale(best)));
-        });
+      // Not within the radius. 1) Show where on the island it IS, if anywhere.
+      // 2) Always suggest the closest taste in stock (radius first, then island), so the
+      //    shopper can choose between driving further and buying something similar nearby.
+      const far = rankOffers(island.filter((o) => o.wine_id === w.id));
+      if (far.length) {
+        where.append(el('p', { class: 'status warn', text: `Not within ${radiusLabel()}. Nearest: ${km(Math.min(...far.map((o) => o.distance_km)))} away.` }),
+          ...far.slice(0, 3).map((o, i) => offerRow(o, i === 0 && o.price != null && !isStale(o))));
       } else {
-        where.append(el('p', { class: 'small muted', text: 'Nothing similar is in stock nearby either.' }));
+        where.append(el('p', { class: 'status warn', text: 'No store in Aruba has it right now.' }));
       }
-      if (state.radius < 40) {
-        where.append(el('p', { class: 'small' },
-          el('button', { class: 'linkbtn', type: 'button', onclick: () => setRadius(40), text: 'Search the whole island' })));
+      const subs = w.partial && !w.color ? [] : suggestionBlock(w, allOffers, island, 2);
+      if (subs.length) {
+        if (far.length) where.append(el('p', { class: 'small muted', text: 'Or something that tastes like it:' }));
+        where.append(...subs);
+      } else {
+        where.append(el('p', { class: 'small muted', text: 'Nothing with a similar taste is in stock on the island yet.' }));
       }
     }
     card.append(where);
@@ -352,6 +453,32 @@
       el('p', { style: 'font-weight:600', text: title }), hint ? el('p', { class: 'small muted', text: hint }) : null, extra || null));
   }
 
+  // A wine we don't know yet: still answer with the closest taste in stock.
+  // Grape/region in the query → typical profile. Otherwise ask for the grape (one tap).
+  function renderUnknown(query, guess, near, island) {
+    const head = [
+      el('p', { style: 'font-weight:600', text: `“${query}” isn’t in our catalog yet.` }),
+      el('p', { class: 'small muted', text: LIVE ? 'We logged it and will look it up, so it can show up in future searches.' : 'Try the producer name or grape.' })
+    ];
+    const box = el('div', { class: 'where' });
+    const show = (g) => {
+      const subs = suggestionBlock(g, near, island, 3);
+      box.replaceChildren(subs.length
+        ? el('p', { class: 'status ok', text: `Closest in taste to a typical ${g._from}, in stock:` })
+        : el('p', { class: 'status warn', text: `Nothing like a typical ${g._from} is in stock on the island yet.` }), ...subs);
+    };
+    if (guess) {
+      show(guess);
+    } else {
+      const grapes = ['Cabernet Sauvignon', 'Malbec', 'Merlot', 'Pinot Noir', 'Red blend', 'Chardonnay', 'Sauvignon Blanc', 'Pinot Grigio', 'Moscato', 'Rosé', 'Prosecco'];
+      box.append(el('p', { class: 'small', text: 'What grape or style is it? We’ll suggest the closest taste in stock:' }),
+        el('div', { class: 'grape-list' }, grapes.map((g) => el('button', {
+          class: 'chip', type: 'button', text: g, onclick: () => show(guessProfile(g))
+        }))));
+    }
+    $('results').replaceChildren(el('div', { class: 'empty' }, ...head), el('article', { class: 'wine' }, box));
+  }
+
   async function runSearch(query, source = 'text') {
     state.lastQuery = query; state.lastSource = source;
     const res = $('results');
@@ -363,12 +490,19 @@
     try { offers = await getOffers(); } catch (e) {
       console.error(e); renderEmpty('Could not load store data.', 'Check your connection and try again.'); return;
     }
-    const matches = matchWines(query);
+    let matches = matchWines(query);
+    // Typed searches: keep only wines that really are the one asked for (label scans stay fuzzy, OCR is noisy).
+    const fuzzyTop = matches[0] && matches[0].w;
+    if (source === 'text') matches = matches.filter((m) => isExactHit(query, m.w));
     if (!matches.length) {
       logSearch(query, null, false, source);
-      renderEmpty(source === 'scan' ? 'Couldn’t recognize that label.' : `“${query}” isn’t in our catalog yet.`,
-        source === 'scan' ? 'Try a sharper photo of the front label, or type the name.' :
-          (LIVE ? 'We logged the request so stores know there’s demand. ' : '') + 'Try the producer name or grape.');
+      if (source === 'scan') { renderEmpty('Couldn’t recognize that label.', 'Try a sharper photo of the front label, or type the name.'); return; }
+      let island = offers;
+      try { island = await getIslandOffers(); } catch (e) { console.error(e); }
+      // No grape/region in the query but a near-miss in the catalog: use that wine's profile as the guide.
+      const guess = guessProfile(query) || (fuzzyTop && fuzzyTop.color && !fuzzyTop.partial
+        ? { ...fuzzyTop, id: 'guess', _from: fuzzyTop.varietal || describe(fuzzyTop) } : null);
+      renderUnknown(query, guess, offers, island);
       return;
     }
     // Order: best text match first; among equal matches, in-stock nearby first, then cheapest.
@@ -378,7 +512,9 @@
     const wines = matches.map((m) => m.w);
     logSearch(query, wines[0].id, nearby(wines[0]), source);
     personalizeGuide(wines[0]);
-    res.replaceChildren(...wines.map((w) => wineCard(w, offers, offers)));
+    let island = offers;
+    if (wines.some((w) => !nearby(w))) { try { island = await getIslandOffers(); } catch (e) { console.error(e); } }
+    res.replaceChildren(...wines.map((w) => wineCard(w, offers, offers, island)));
     state.searches++;
     maybeInterstitial();
   }
