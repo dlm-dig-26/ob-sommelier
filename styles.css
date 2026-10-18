@@ -79,8 +79,8 @@ main {
 .band .search { border-color: transparent; }
 .search:focus-within { border-color: var(--ink); }
 .band .search:focus-within { border-color: var(--tag); box-shadow: 0 0 0 1px var(--tag); }
-/* Small square icon buttons at the end of the field: 16 px icons, 36 px tap squares */
-.ibtn { flex: none; width: 36px; height: 36px; display: grid; place-items: center; padding: 0; margin-left: 4px; border: 1.5px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); cursor: pointer; }
+/* Small square icon buttons at the end of the field: 16 px icons, 32 px squares */
+.ibtn { flex: none; width: 32px; height: 32px; display: grid; place-items: center; padding: 0; margin-left: 4px; border: 1.5px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); cursor: pointer; }
 .ibtn .i { width: 16px; height: 16px; stroke-width: 2.2; }
 .ibtn:hover { border-color: var(--ink); }
 .ibtn.go { background: var(--tag); border-color: var(--tag); color: var(--tag-ink); }
