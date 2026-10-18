@@ -21,3 +21,5 @@
 .links .pp { font-family: var(--tagface); font-weight: 600; font-size: 18px; margin-left: 6px; white-space: nowrap; }
 .links.wines li { display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; }
 @media (min-width: 640px) { .pg-wine, .pg-store { margin-inline: 0; padding: 24px; } }
+.langs { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0 0 10px; }
+.langs [aria-current] { font-weight: 700; color: var(--ink); }
