@@ -1,6 +1,6 @@
 {
   "id": "./",
-  "name": "OB Sommelier — Local Wine Finder",
+  "name": "OB Sommelier Aruba",
   "short_name": "OB Sommelier",
   "description": "Find where to buy a wine near you in Aruba, at the best price.",
   "start_url": "./?source=pwa",

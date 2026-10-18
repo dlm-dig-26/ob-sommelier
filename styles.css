@@ -60,7 +60,7 @@ svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 .brand { display: flex; gap: 10px; align-items: center; }
-.brand h1 { font: 400 22px/1.1 var(--display); margin: 0; letter-spacing: .2px; }
+.brand h1 { font: 400 clamp(19px, 5.6vw, 22px)/1.1 var(--display); margin: 0; letter-spacing: .2px; white-space: nowrap; }
 .brand p { margin: 0; }
 .logo, .logo-lg { width: 34px; height: 34px; border-radius: 8px; background: url(icons/icon-192.png) center/cover; flex: none; }
 .logo-lg { width: 60px; height: 60px; border-radius: 14px; margin: 0 auto 10px; }

@@ -1,4 +1,4 @@
-/* OB Sommelier: contributor + admin page.
+/* OB Sommelier Aruba: contributor + admin page.
  * Contributors (invite-only, emailed sign-in link) pick the store they are in and upload shelf photos.
  * Photos go to private storage; a daily Claude task reads them and records the wines as "seen on the shelf".
  * Admins (contributors.role = 'admin') invite/deactivate contributors and can undo any submission.
@@ -53,7 +53,7 @@
     role = data;
     if (!role) {
       app.replaceChildren(card(el('h2', { class: 'h2', text: 'You are not on the contributor list yet' }),
-        el('p', null, `You are signed in as ${user.email}. Ask the OB Sommelier team to add this email, then reload this page.`)), signOutLine());
+        el('p', null, `You are signed in as ${user.email}. Ask the OB Sommelier Aruba team to add this email, then reload this page.`)), signOutLine());
       return;
     }
     const parts = [await visitCard(), await mySubmissionsCard()];
@@ -74,7 +74,7 @@
       form.replaceChildren(notice(`Check ${email.value} for your sign-in link. Open it on this phone.`, 'ok'));
     } }, field('Your email', email), btn);
     app.replaceChildren(card(el('h2', { class: 'h2', text: 'Contributor sign-in' }),
-      el('p', { class: 'small muted' }, 'Invite only. Use the email the OB Sommelier team added. ',
+      el('p', { class: 'small muted' }, 'Invite only. Use the email the OB Sommelier Aruba team added. ',
         el('a', { href: 'privacy.html', text: 'Privacy and terms' }), '.'), form));
   }
 
