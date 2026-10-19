@@ -662,9 +662,15 @@
   }
 
   // ---------- Ads (house ads only; never on launch; rate-limited) ----------
-  const HOUSE_ADS = [
+  // Two ad tiers (D, 18 Oct 2026):
+  //  PREMIUM: one advertiser, top of the page right above the search (highest price).
+  //  NORMAL: rotating carousel lower on the page (several advertisers share it).
+  // House promos until real advertisers are sold; replace entries with real ads.
+  const PREMIUM_AD = ['Premium spot', 'This space sits above every search on the island. One advertiser at a time.', 'vendor.html'];
+  const NORMAL_ADS = [
     ['Your store here', 'List your wines and reach shoppers who are searching nearby.', 'vendor.html'],
-    ['Featured placement', 'Be the first result for your best-sellers. Ask about sponsored listings.', 'vendor.html']
+    ['Featured placement', 'Be the first result for your best-sellers. Ask about sponsored listings.', 'vendor.html'],
+    ['Wine brands and distributors', 'Show your wines to shoppers who are looking for them right now.', 'vendor.html']
   ];
   function adNode([title, body, href]) {
     return [el('p', { class: 'tag', text: 'Sponsored' }),
@@ -672,8 +678,27 @@
   }
   function setupAds() {
     if (!CFG.ADS_ENABLED) return;
-    $('adTop').replaceChildren(...adNode(HOUSE_ADS[0])); $('adTop').hidden = false;
-    $('adBottom').replaceChildren(...adNode(HOUSE_ADS[1])); $('adBottom').hidden = false;
+    $('adTop').replaceChildren(...adNode(PREMIUM_AD)); $('adTop').hidden = false;
+    adCarousel($('adBottom'), NORMAL_ADS);
+  }
+  // Swipeable carousel; advances every 7 s, pauses while touched/hovered or off screen, never moves with reduced motion.
+  function adCarousel(box, ads) {
+    if (!ads.length) return;
+    const track = el('div', { class: 'ad-track' }, ads.map((a, i) => el('div', { class: 'ad ad-slide', role: 'group', 'aria-label': `${i + 1} of ${ads.length}` }, ...adNode(a))));
+    const dots = el('div', { class: 'ad-dots' }, ads.map((_, i) => el('button', { type: 'button', 'aria-label': `Show ad ${i + 1}`, onclick: () => go(i) })));
+    box.replaceChildren(track, ads.length > 1 ? dots : '');
+    box.hidden = false;
+    let cur = 0;
+    const mark = () => [...dots.children].forEach((d, i) => d.setAttribute('aria-current', i === cur ? 'true' : 'false'));
+    const go = (i) => { cur = (i + ads.length) % ads.length; track.scrollTo({ left: track.clientWidth * cur, behavior: 'smooth' }); mark(); };
+    track.addEventListener('scroll', () => { const i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth)); if (i !== cur) { cur = i; mark(); } }, { passive: true });
+    mark();
+    if (ads.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let paused = false, visible = false;
+    ['pointerenter', 'touchstart', 'focusin'].forEach((e) => box.addEventListener(e, () => { paused = true; }, { passive: true }));
+    ['pointerleave', 'touchend', 'focusout'].forEach((e) => box.addEventListener(e, () => { paused = false; }, { passive: true }));
+    if ('IntersectionObserver' in window) new IntersectionObserver(([en]) => { visible = en.isIntersecting; }).observe(box); else visible = true;
+    setInterval(() => { if (!paused && visible && !document.hidden) go(cur + 1); }, 7000);
   }
   function maybeInterstitial() {
     if (!CFG.ADS_ENABLED || state.searches < (CFG.INTERSTITIAL_AFTER_SEARCHES || 3)) return;

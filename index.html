@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@600&family=Gloock&display=swap" />
-  <link rel="stylesheet" href="styles.css?v=20261018h" />
+  <link rel="stylesheet" href="styles.css?v=20261018i" />
 </head>
 <body>
   <!-- AGE GATE -->
@@ -60,6 +60,7 @@
   </header>
 
   <section class="finder" aria-labelledby="finderTitle">
+    <aside id="adTop" class="ad premium" aria-label="Sponsored" hidden></aside>
     <h2 id="finderTitle" class="lede">Which wine are you looking for?</h2>
     <form id="searchForm" class="search" autocomplete="off" role="search">
       <input id="q" type="search" placeholder="Name, producer or grape" aria-label="Wine name, producer or grape" enterkeyhint="search" />
@@ -91,7 +92,6 @@
 
   <main>
     <div id="suggest" class="chips" aria-label="Popular searches"></div>
-    <div id="adTop" class="ad" hidden></div>
 
     <section id="results" aria-live="polite"></section>
     <p id="priceNote" class="small muted price-note" hidden>Prices are valid for 90 days from when they were last confirmed by a shelf photo, a store price list or the store itself. After 90 days a price is no longer shown until a new photo updates it. Prices can change at any time; check at the store.</p>
@@ -105,7 +105,7 @@
       <div id="pairings" class="pairings"></div>
     </details>
 
-    <div id="adBottom" class="ad" hidden></div>
+    <aside id="adBottom" class="ad-carousel" aria-label="Sponsored" aria-roledescription="carousel" hidden></aside>
 
     <footer class="foot">
       <p class="about">OB Sommelier Aruba shows which supermarkets, liquor stores and wine shops in Aruba carry the wine you want, from Oranjestad and Noord to Palm Beach, Santa Cruz and San Nicolas. Search by name, producer or grape, or scan the label, and see prices cheapest first. Can’t find it nearby? You get the closest wine in taste that is in stock, plus what to eat with it, from keshi yena and stobá to fresh fish.</p>
@@ -116,7 +116,7 @@
     </footer>
   </main>
 
-  <script src="config.js?v=20261018h"></script>
-  <script src="app.js?v=20261018h"></script>
+  <script src="config.js?v=20261018i"></script>
+  <script src="app.js?v=20261018i"></script>
 </body>
 </html>
