@@ -636,6 +636,13 @@
       if (entry) for (const w of state.wines) if (entry[1].some((g) => fits(g, w)) && !hits.some((h) => h.id === w.id)) hits.push({ id: w.id, dish: entry[0], why: entry[2], score: 0 });
     }
     const pick = (offers, id) => rankOffers(offers.filter((o) => o.wine_id === id))[0];
+    // AI sommelier: when our own pairing data has fewer than 3 matches, ask the AI which wine styles fit,
+    // then find those styles in stock at the closest store. Answers are cached on the server.
+    if (LIVE && hits.filter((h) => h.score > 0).length < 3) {
+      const ai = await askSommelier(dish);
+      if (ai && ai.styles && ai.styles.length) { renderAiPairing(dish, ai, near, island, pick); return; }
+      if (ai && ai.is_food === false) { renderEmpty(`“${dish}” doesn’t look like a dish.`, 'Type what you are cooking, for example keshi yena, grilled fish or pasta with tomato sauce.'); return; }
+    }
     let rows = hits.filter((h) => state.winesById.has(h.id)).map((h) => ({ ...h, w: state.winesById.get(h.id), o: pick(near, h.id) || pick(island, h.id) }))
       .filter((r) => r.o);
     const inRadius = new Set(near.map((o) => o.wine_id));
@@ -653,6 +660,45 @@
         el('p', { class: 'notes' }, el('b', { text: r.dish }), r.why ? `. ${r.why}` : ''),
         el('div', { class: 'where' }, offerRow(r.o, false)),
         el('p', { class: 'small' }, el('button', { class: 'linkbtn', type: 'button', text: 'All stores that have it', onclick: () => { $('q').value = r.w.name; runSearch(r.w.name, 'text'); } })))));
+  }
+
+  async function askSommelier(dish) {
+    try {
+      const { data, error } = await state.sb.functions.invoke('sommelier', { body: { dish, device: deviceId() } });
+      if (error || !data || data.status !== 'ok') return null;
+      return data;
+    } catch (e) { console.error(e); return null; }
+  }
+  // A wine fits an AI style when the colour matches, a named grape matches (if any were named) and body/sweetness are in range.
+  function fitsStyle(w, st, strict) {
+    if (w.color !== st.color || w.partial) return false;
+    if (strict && st.grapes.length && !st.grapes.some((g) => fits(g, w))) return false;
+    if (w.body && (w.body < st.body_min || w.body > st.body_max)) return false;
+    if (w.sweetness && w.sweetness > st.sweetness_max) return false;
+    return true;
+  }
+  function renderAiPairing(dish, ai, near, island, pick) {
+    const blocks = [el('p', { class: 'status ok', text: `Our sommelier for ${ai.dish || dish}` })];
+    const used = new Set();
+    for (const st of ai.styles) {
+      let cand = state.wines.filter((w) => !used.has(w.id) && fitsStyle(w, st, true));
+      if (cand.length < 2) cand = cand.concat(state.wines.filter((w) => !used.has(w.id) && !cand.includes(w) && fitsStyle(w, st, false)));
+      const found = cand.map((w) => ({ w, o: pick(near, w.id) || pick(island, w.id) })).filter((r) => r.o)
+        .sort((a, b) => (isStale(a.o) - isStale(b.o)) || (a.o.distance_km - b.o.distance_km)).slice(0, 2);
+      found.forEach((r) => used.add(r.w.id));
+      blocks.push(el('article', { class: 'wine' },
+        el('h3', { text: st.label }),
+        el('p', { class: 'notes', text: st.why }),
+        st.grapes.length ? el('p', { class: 'meta small', text: `Look for: ${st.grapes.join(', ')}` }) : null,
+        found.length ? el('div', { class: 'where' }, ...found.flatMap((r) => [
+          el('p', { class: 'sub-wine' }, el('button', { class: 'linkbtn', type: 'button', text: r.w.name, onclick: () => { $('q').value = r.w.name; runSearch(r.w.name, 'text'); } }),
+            el('span', { class: 'small muted', text: ` ${describe(r.w)}` })),
+          offerRow(r.o, false)]))
+          : el('p', { class: 'small muted', text: 'Not seen in a store near you yet.' })));
+    }
+    blocks.push(el('p', { class: 'small muted', text: 'Suggested by our AI sommelier. Stores and prices come from our own store data.' }));
+    $('priceNote').hidden = false;
+    $('results').replaceChildren(...blocks);
   }
 
   // ---------- Pairings & recipes ----------
