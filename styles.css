@@ -268,3 +268,9 @@ main {
 @media (min-width: 640px) {
   #suggest { flex-wrap: wrap; overflow: visible; margin-inline: 0; padding: 0; white-space: normal; }
 }
+
+/* Dish search ("What are you cooking?"), above the pairing guide */
+.dish-finder { border-top: 2px solid var(--bottle); padding-top: 16px; display: grid; gap: 6px; }
+.dish-finder .guide-sub { color: var(--muted); font-size: 15px; margin: 0 0 4px; }
+.dish-finder .guide-title { margin: 0; }
+.dish-finder + .guide { border-top: 1px solid var(--line); }

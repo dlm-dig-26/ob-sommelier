@@ -80,7 +80,7 @@
     if (LIVE) {
       await loadScript(SUPABASE_JS);
       state.sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY, { auth: { persistSession: false } });
-      const { data, error } = await state.sb.from('wines').select('*').is('merged_into', null).limit(5000);
+      const { data, error } = await state.sb.from('wines').select('id,name,producer,varietal,color,country,region,body,sweetness,acidity,tannin,flavor_notes,pairing,aliases,partial,source').is('merged_into', null).limit(5000);
       if (error) throw error;
       state.wines = data;
       const pop = await state.sb.rpc('popular_wines', { p_days: 30 });
@@ -301,7 +301,7 @@
           el('div', { class: 'why', text: `Try instead. ${reasonFor(w, x)}:` }),
           el('div', { class: 'name', text: x.name }),
           el('div', { class: 'small muted', text: x.flavor_notes || describe(x) })),
-        offerRow(best, best.price != null && !isStale(best))])
+        offerRow(best, false)])
     ];
   }
 
@@ -309,7 +309,10 @@
   const priceKey = (o) => (o.price == null ? Infinity : o.price * 750 / (o.size_ml || 750));
   // A shelf sighting older than STALE_DAYS stays visible as "last known" (different colour, no date).
   const isStale = (o) => Date.now() - Date.parse(o.last_confirmed) > STALE_DAYS * DAY;
-  const rankOffers = (list) => [...list].sort((a, b) => isStale(a) - isStale(b) || priceKey(a) - priceKey(b) || a.distance_km - b.distance_km);
+  // Store order (D, 23 Oct 2026): closest store first; price breaks ties. Stale ("last known") sightings go last.
+  const rankOffers = (list) => [...list].sort((a, b) => isStale(a) - isStale(b) || a.distance_km - b.distance_km || priceKey(a) - priceKey(b));
+  // The yellow shelf tag marks the lowest current price among the stores shown (only when there is a choice).
+  const cheapestOf = (list) => { const p = list.filter((o) => o.price != null && !isStale(o)).sort((a, b) => priceKey(a) - priceKey(b)); return list.length > 1 ? p[0] : null; };
 
   // ---------- Rendering ----------
   const sizeLabel = (ml) => ml >= 1000 ? `${String(ml / 1000).replace('.', ',')} L` : `${ml} ml`;
@@ -425,9 +428,9 @@
       const n = mine.filter((o) => !isStale(o)).length;
       const status = n === 0
         ? el('p', { class: 'status warn', text: `Not seen recently within ${radiusLabel()}. Last known stores:` })
-        : el('p', { class: 'status ok', text: n === 1 ? `1 store within ${radiusLabel()} has it.` : `${n} stores within ${radiusLabel()} have it. Cheapest first.` });
+        : el('p', { class: 'status ok', text: n === 1 ? `1 store within ${radiusLabel()} has it.` : `${n} stores within ${radiusLabel()} have it. Closest first; the yellow tag is the lowest price.` });
       where.append(status,
-        ...mine.map((o, i) => offerRow(o, i === 0 && o.price != null && !isStale(o))));
+        ...mine.map((o) => offerRow(o, o === cheapestOf(mine))));
     } else {
       // Not within the radius. 1) Show where on the island it IS, if anywhere.
       // 2) Always suggest the closest taste in stock (radius first, then island), so the
@@ -435,7 +438,7 @@
       const far = rankOffers(island.filter((o) => o.wine_id === w.id));
       if (far.length) {
         where.append(el('p', { class: 'status warn', text: `Not within ${radiusLabel()}. Nearest: ${km(Math.min(...far.map((o) => o.distance_km)))} away.` }),
-          ...far.slice(0, 3).map((o, i) => offerRow(o, i === 0 && o.price != null && !isStale(o))));
+          ...far.slice(0, 3).map((o, _i, arr) => offerRow(o, o === cheapestOf(arr))));
       } else {
         where.append(el('p', { class: 'status warn', text: 'No store in Aruba has it right now.' }));
       }
@@ -506,6 +509,13 @@
     // Typed searches: keep only wines that really are the one asked for (label scans stay fuzzy, OCR is noisy).
     const fuzzyTop = matches[0] && matches[0].w;
     if (source === 'text') matches = matches.filter((m) => isExactHit(query, m.w));
+    // Store name typed (e.g. "Chengs", "Hodgson"): show that store's top wines.
+    if (!matches.length && source === 'text') {
+      let island = offers;
+      try { island = await getIslandOffers(); } catch (e) { console.error(e); }
+      const st = matchStore(query, island);
+      if (st) { renderStore(st, island); return; }
+    }
     if (!matches.length) {
       logSearch(query, null, false, source);
       if (source === 'scan') { renderEmpty('Couldn’t recognize that label.', 'Try a sharper photo of the front label, or type the name.'); return; }
@@ -565,6 +575,84 @@
     } finally {
       $('scanInput').value = '';
     }
+  }
+
+  // ---------- Store search (D's offline notes, 23 Oct 2026) ----------
+  // A query matches a store when every word (3+ letters) starts a word of the store's name.
+  const STORE_STOP = new Set(['supermarket', 'super', 'market', 'store', 'shop', 'the', 'aruba', 'trading', 'wines', 'liquor']);
+  function matchStore(query, offers) {
+    const q = norm(query).split(' ').filter((x) => x.length >= 3 && !STORE_STOP.has(x));
+    if (!q.length) return null;
+    const stores = new Map();
+    for (const o of offers) if (!stores.has(o.store_id)) stores.set(o.store_id, o);
+    const hits = [...stores.values()].filter((o) => { const words = norm(o.store_name.replace(/'/g, '')).split(' '); return q.every((t) => words.some((w) => w.startsWith(t))); });
+    return hits.length ? hits.sort((a, b) => a.distance_km - b.distance_km)[0] : null;
+  }
+  const storeSlug = (name) => String(name).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+  function renderStore(st, island) {
+    const list = island.filter((o) => o.store_id === st.store_id && state.winesById.has(o.wine_id));
+    // Top 10: most searched first (once there is search data), then wines with a current price, then wines with tasting notes.
+    const score = (o) => [-(state.popularity.get(o.wine_id) || 0), (o.price != null && !isStale(o)) ? 0 : 1, state.winesById.get(o.wine_id).flavor_notes ? 0 : 1];
+    const top = list.sort((a, b) => { const x = score(a), y = score(b); return x[0] - y[0] || x[1] - y[1] || x[2] - y[2] || state.winesById.get(a.wine_id).name.localeCompare(state.winesById.get(b.wine_id).name); }).slice(0, 10);
+    const anyPopular = top.some((o) => state.popularity.get(o.wine_id));
+    $('results').replaceChildren(el('article', { class: 'wine' },
+      el('h3', { text: st.store_name }),
+      el('p', { class: 'meta', text: `${km(st.distance_km)} away${st.address ? ', ' + st.address : ''}` }),
+      st.hours ? el('p', { class: 'small', text: `Open: ${st.hours}` }) : null,
+      el('p', { class: 'small' }, el('a', { href: `https://www.google.com/maps/dir/?api=1&destination=${st.lat},${st.lng}`, target: '_blank', rel: 'noopener', text: 'Directions' }), '. ',
+        el('a', { href: `store/${storeSlug(st.store_name)}/`, text: `All ${list.length} wines at this store` }), '.'),
+      el('div', { class: 'where' },
+        el('p', { class: 'status ok', text: anyPopular ? 'Most searched wines here' : 'Wines here with a current price first' }),
+        ...top.map((o) => { const w = state.winesById.get(o.wine_id); return el('div', { class: 'offer' },
+          el('div', null, el('button', { class: 'linkbtn store', type: 'button', text: w.name, onclick: () => { $('q').value = w.name; runSearch(w.name, 'text'); } }),
+            el('div', { class: 'sub', text: describe(w) })),
+          priceTag(o, false)); }))));
+    $('priceNote').hidden = false;
+  }
+
+  // ---------- Dish search: "what are you cooking?" (D's offline notes, 23 Oct 2026) ----------
+  // Common food words in Spanish, Papiamento and Dutch mapped to the English the pairings are written in.
+  const FOOD_WORDS = { pescado: 'fish', pisca: 'fish', vis: 'fish', pollo: 'chicken', galinja: 'chicken', kip: 'chicken', carne: 'beef', carni: 'beef', vlees: 'beef', res: 'beef', bistec: 'steak', biefstuk: 'steak', cerdo: 'pork', puerco: 'pork', porco: 'pork', varkensvlees: 'pork', cabrito: 'goat', kabritu: 'goat', geit: 'goat', camarones: 'shrimp', camaron: 'shrimp', gamba: 'shrimp', garnalen: 'shrimp', mariscos: 'seafood', zeevruchten: 'seafood', queso: 'cheese', kaas: 'cheese', postre: 'dessert', toetje: 'dessert', ensalada: 'salad', salade: 'salad', cordero: 'lamb', lamsvlees: 'lamb', pato: 'duck', eend: 'duck', langosta: 'lobster', kreeft: 'lobster', arroz: 'rice', rijst: 'rice', parrilla: 'grilled', asado: 'barbecue', sopa: 'soup', soep: 'soup', sopi: 'soup', stoba: 'stew', guiso: 'stew', estofado: 'stew', stoofpot: 'stew' };
+  const toEnglishFood = (q) => norm(q).split(' ').map((w) => FOOD_WORDS[w] || w).join(' ');
+  async function runDishSearch(dish) {
+    dish = String(dish || '').trim().slice(0, 80);
+    const res = $('results');
+    if (!dish) return;
+    res.replaceChildren(el('div', { class: 'empty small muted', text: 'Finding wines for your dish…' }));
+    res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    try { await state.ready; } catch { renderEmpty('Could not load the wine catalog.', 'Check your connection and reload.'); return; }
+    let near = [], island = [];
+    try { near = await getOffers(); island = await getIslandOffers(); } catch (e) { console.error(e); renderEmpty('Could not load store data.', 'Check your connection and try again.'); return; }
+    const terms = [...new Set([dish, toEnglishFood(dish)])];
+    let hits = [];
+    if (LIVE) {
+      const { data, error } = await state.sb.rpc('dish_matches', { p_terms: terms });
+      if (!error && data) hits = data.map((r) => ({ id: r.wine_id, dish: r.dish, why: r.why, score: r.score }));
+    }
+    // Pairing-guide fallback: dish matches a guide entry -> wines of those grapes.
+    if (hits.length < 3) {
+      const t = terms.map((x) => norm(x).split(' ').filter((w) => w.length >= 3));
+      const entry = PAIRINGS.find(([d]) => t.some((ws) => ws.length && ws.every((w) => norm(d).includes(w))));
+      if (entry) for (const w of state.wines) if (entry[1].some((g) => fits(g, w)) && !hits.some((h) => h.id === w.id)) hits.push({ id: w.id, dish: entry[0], why: entry[2], score: 0 });
+    }
+    const pick = (offers, id) => rankOffers(offers.filter((o) => o.wine_id === id))[0];
+    let rows = hits.filter((h) => state.winesById.has(h.id)).map((h) => ({ ...h, w: state.winesById.get(h.id), o: pick(near, h.id) || pick(island, h.id) }))
+      .filter((r) => r.o);
+    const inRadius = new Set(near.map((o) => o.wine_id));
+    rows.sort((a, b) => (inRadius.has(b.id) - inRadius.has(a.id)) || (b.score - a.score) || (isStale(a.o) - isStale(b.o)) || (a.o.distance_km - b.o.distance_km));
+    rows = rows.slice(0, 6);
+    if (!rows.length) {
+      renderEmpty(`No wine match for “${dish}” yet.`, 'Try the main ingredient (fish, chicken, steak, cheese) or a dish from the pairing guide below.');
+      return;
+    }
+    $('priceNote').hidden = false;
+    res.replaceChildren(el('p', { class: 'status ok', text: `Wines for ${dish}, closest store first` }),
+      ...rows.map((r) => el('article', { class: 'wine' },
+        el('h3', { text: r.w.name }),
+        el('p', { class: 'meta', text: describe(r.w) }),
+        el('p', { class: 'notes' }, el('b', { text: r.dish }), r.why ? `. ${r.why}` : ''),
+        el('div', { class: 'where' }, offerRow(r.o, false)),
+        el('p', { class: 'small' }, el('button', { class: 'linkbtn', type: 'button', text: 'All stores that have it', onclick: () => { $('q').value = r.w.name; runSearch(r.w.name, 'text'); } })))));
   }
 
   // ---------- Pairings & recipes ----------
@@ -737,6 +825,7 @@
     $('scanBtn').addEventListener('click', () => { toastScan(''); $('scanInput').click(); });
     $('scanInput').addEventListener('change', (e) => { const f = e.target.files[0]; if (f) handleScan(f).finally(() => { e.target.value = ''; }); });
     $('interstitialClose').addEventListener('click', () => { $('interstitial').hidden = true; });
+    $('dishForm').addEventListener('submit', (e) => { e.preventDefault(); $('dish').blur(); runDishSearch($('dish').value); });
     $('suggest').replaceChildren(el('span', { class: 'chips-lead', text: 'Often searched' }), ...['Cabernet', 'Malbec', 'Pinot Noir', 'Sauvignon Blanc', 'Prosecco', 'Rosé'].map((s) =>
       el('button', { class: 'chip', type: 'button', text: s, onclick: () => { $('q').value = s; runSearch(s, 'text'); } })));
 

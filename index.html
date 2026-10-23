@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@600&family=Gloock&display=swap" />
-  <link rel="stylesheet" href="styles.css?v=20261018i" />
+  <link rel="stylesheet" href="styles.css?v=20261023a" />
 </head>
 <body>
   <!-- AGE GATE -->
@@ -96,6 +96,16 @@
     <section id="results" aria-live="polite"></section>
     <p id="priceNote" class="small muted price-note" hidden>Prices are valid for 90 days from when they were last confirmed by a shelf photo, a store price list or the store itself. After 90 days a price is no longer shown until a new photo updates it. Prices can change at any time; check at the store.</p>
 
+    <section class="dish-finder" aria-labelledby="dishTitle">
+      <h2 id="dishTitle" class="guide-title">What are you cooking?</h2>
+      <p class="guide-sub">Type a dish and get the wines that go with it, at the closest store.</p>
+      <form id="dishForm" class="search" autocomplete="off" role="search">
+        <input id="dish" type="search" placeholder="Keshi yena, grilled fish, pasta…" aria-label="Dish you are cooking" enterkeyhint="search" />
+        <button class="ibtn go" type="submit" aria-label="Find wines for this dish" title="Find wines for this dish">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>
+        </button>
+      </form>
+    </section>
     <details id="guide" class="guide">
       <summary>
         <span class="guide-title">Pairing guide</span>
@@ -116,7 +126,7 @@
     </footer>
   </main>
 
-  <script src="config.js?v=20261018i"></script>
-  <script src="app.js?v=20261018i"></script>
+  <script src="config.js?v=20261023a"></script>
+  <script src="app.js?v=20261023a"></script>
 </body>
 </html>
